@@ -34,8 +34,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathFactory;
+
 import org.jenkinsci.plugins.reportinfo.ReportInfo;
 import org.jenkinsci.plugins.reportinfo.model.JobNotification;
 
@@ -54,12 +58,17 @@ public class AllNotificationBuilder extends SimpleFileVisitor<Path> {
     PrintStream logger;
 
     public AllNotificationBuilder(JobNotification jn, Path path, String excludeFolders, PrintStream logger) {
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (ParserConfigurationException e) {
+            ReportInfo.LOG.log(Level.SEVERE, "cannot set FEATURE_SECURE_PROCESSING = true", e);
+        }
         this.jn = jn;
         this.path = path;
         this.logger = logger;
-        for(String folder: excludeFolders.split(",")) {
+        for (String folder : excludeFolders.split(",")) {
             String ftrim = folder.trim();
-            if(ftrim.isEmpty()) {
+            if (ftrim.isEmpty()) {
                 continue;
             }
             ignoreFolders.add(ftrim);
