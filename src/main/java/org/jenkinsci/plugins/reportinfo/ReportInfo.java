@@ -65,7 +65,14 @@ public class ReportInfo extends ListView {
 
     static {
         try {
-            CONTEXT = JAXBContext.newInstance(JobNotification.class);
+            Thread t = Thread.currentThread();
+            ClassLoader orig = t.getContextClassLoader();
+            t.setContextClassLoader(ReportInfo.class.getClassLoader());
+            try {
+                CONTEXT = JAXBContext.newInstance(JobNotification.class);
+            } finally {
+                t.setContextClassLoader(orig);
+            }
         } catch (JAXBException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
